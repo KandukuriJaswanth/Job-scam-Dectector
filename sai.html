@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Regex & Fake Job Detector Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f5f5f5;
+        }
+        textarea, input, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+        .page {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 15px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background: #e9ecef;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Regex Matcher & Fake Job Detector</h1>
+
+<nav>
+    <a href="#" onclick="showPage('homePage')">🏠 Home</a>
+    <a href="#" onclick="showPage('regexToolPage')">🔎 Regex Matcher</a>
+    <a href="#" onclick="showPage('fakeJobPage')">🚨 Fake Job Detector</a>
+</nav>
+
+<div id="homePage" class="page">
+    <h2>Welcome to Tool Hub</h2>
+    <p>Use the navigation above to access tools:</p>
+    <ul>
+        <li><a href="#" onclick="showPage('regexToolPage')">🔎 Regex Matcher Tool</a></li>
+        <li><a href="#" onclick="showPage('fakeJobPage')">🚨 Fake Job Detector</a></li>
+    </ul>
+</div>
+
+<!-- Regex Matcher Tool -->
+<div id="regexToolPage" class="page hidden">
+    <h2>Regex Matcher Tool</h2>
+    <label>Test String:</label>
+    <textarea id="testString" rows="4"></textarea>
+
+    <label>Regex Pattern:</label>
+    <input type="text" id="regexPattern">
+
+    <button onclick="findMatches()">Find Matches</button>
+
+    <h3>Matches Found:</h3>
+    <ul id="matchList"></ul>
+
+    <h3>Validate Email</h3>
+    <label>Email:</label>
+    <input type="email" id="emailInput">
+    <button onclick="validateEmail()">Validate Email</button>
+
+    <p id="emailValidationResult"></p>
+</div>
+
+<!-- Fake Job Detector -->
+<div id="fakeJobPage" class="page hidden">
+    <h2>Fake Job Detector</h2>
+    <label>Company Name:</label>
+    <input type="text" id="companyName">
+
+    <button onclick="searchGoogle()">🔍 Search Google</button>
+    <button onclick="searchLinkedIn()">🔍 Search LinkedIn</button>
+    <button onclick="searchNaukri()">🔍 Search Naukri</button>
+
+    <label>Company Address:</label>
+    <textarea id="companyAddress" rows="4"></textarea>
+
+    <button onclick="checkFakeJob()">Check Job Posting</button>
+
+    <h3>Fake Job Check Result</h3>
+    <p id="fakeJobResult"></p>
+</div>
+
+<script>
+    // Navigation handling
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+    }
+
+    // Regex Matcher functionality
+    function findMatches() {
+        const testString = document.getElementById('testString').value;
+        const regexPattern = document.getElementById('regexPattern').value;
+
+        let regex;
+        try {
+            regex = new RegExp(regexPattern, 'g');
+        } catch (e) {
+            alert('Invalid regex pattern!');
+            return;
+        }
+
+        const matches = testString.match(regex) || [];
+        const matchList = document.getElementById('matchList');
+        matchList.innerHTML = '';
+
+        if (matches.length > 0) {
+            matches.forEach(match => {
+                const li = document.createElement('li');
+                li.textContent = match;
+                matchList.appendChild(li);
+            });
+        } else {
+            matchList.innerHTML = '<li>No matches found.</li>';
+        }
+    }
+
+    // Email Validation functionality
+    function validateEmail() {
+        const email = document.getElementById('emailInput').value;
+        const emailValidationResult = document.getElementById('emailValidationResult');
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(email)) {
+            emailValidationResult.innerText = `✅ ${email} is valid.`;
+        } else {
+            emailValidationResult.innerText = `❌ ${email} is invalid.`;
+        }
+    }
+
+    // External Search Links
+    function searchGoogle() {
+        const companyName = document.getElementById('companyName').value;
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(companyName + ' company review')}`, '_blank');
+    }
+
+    function searchLinkedIn() {
+        const companyName = document.getElementById('companyName').value;
+        window.open(`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(companyName)}`, '_blank');
+    }
+
+    function searchNaukri() {
+        const companyName = document.getElementById('companyName').value;
+        window.open(`https://www.naukri.com/${encodeURIComponent(companyName)}-jobs`, '_blank');
+    }
+
+    // Fake Job Checker
+    function checkFakeJob() {
+        const companyName = document.getElementById('companyName').value.trim().toLowerCase();
+        const companyAddress = document.getElementById('companyAddress').value.trim().toLowerCase();
+        const resultElement = document.getElementById('fakeJobResult');
+
+        // Simple logic for now - can be replaced with backend API calls if needed
+        const suspiciousKeywords = ['consultancy', 'service charge', 'pay', 'deposit', 'training fee', 'registration fee'];
+
+        let isFake = suspiciousKeywords.some(keyword => 
+            companyName.includes(keyword) || companyAddress.includes(keyword)
+        );
+
+        if (isFake) {
+            resultElement.innerHTML = '⚠️ This job posting seems suspicious. Please investigate further.';
+        } else {
+            resultElement.innerHTML = '✅ This job posting looks legitimate, but always verify.';
+        }
+    }
+</script>
+
+</body>
+</html>
